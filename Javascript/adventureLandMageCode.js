@@ -13,7 +13,7 @@
 // 1.) Characters sometimes use the smart_move command excessively
 // 2.) If the code is activated when standing near the targetedMonster...
 //   - The player will usually excessively spam smart_move
-//   - The player may also engage the wrong enemies
+// 3.) The player may also engage the wrong enemies
 
 
 var farm_mode=true;
