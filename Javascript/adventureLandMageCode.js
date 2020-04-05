@@ -7,14 +7,14 @@
 // 3.) Targeted monster is attacked after respawning or buying potions
 // 4.) Character accepts party requests from trusted players
 //   - They check every 10 minutes
-// 5.) This character will move slightly when attacking enemies to dodge
+// 5.) This character will move large distances when attacking enemies to dodge
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
 // 2.) If the code is activated when standing near the targetedMonster...
 //   - The player will usually excessively spam smart_move
 // 3.) The player may also engage the wrong enemies
-
+//   - Slightly mitigated by specifying exp cutoffs
 
 var farm_mode=true;
 var targetedMonster="tortoise";
@@ -23,7 +23,6 @@ const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme"];
 const LOWHP = character.max_hp / 1.75;
 const LOWMP = character.max_mp / 1.75;
-
 
 // Checks if potions are empty and goes to purchase them automatically
 function getPotions() {
@@ -74,7 +73,7 @@ function statusChecks() {
 function farmMonster() {
 	var target=get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:300, max_att:420});
+		target=get_nearest_monster({min_xp:700, max_att:720});
 		if(target) change_target(target); // Change target to newly found one
 		else {
 			set_message("No Monsters");
@@ -153,5 +152,3 @@ setInterval(() => {
 		return;
 	}
 }, 1000); // Loops every second.
-// Learn Javascript: https://www.codecademy.com/learn/introduction-to-javascript
-// Write your own CODE: https://github.com/kaansoral/adventureland
