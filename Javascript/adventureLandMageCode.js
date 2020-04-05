@@ -73,7 +73,7 @@ function statusChecks() {
 function farmMonster() {
 	var target=get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:2500, max_att:1000});
+		target=get_nearest_monster({min_xp:2500, max_att:500});
 		if(target) change_target(target); // Change target to newly found one
 		else {
 			set_message("No Monsters");
@@ -109,7 +109,7 @@ function goToMonsterFarm() {
 	}
 	var target=get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:2500, max_att:1000});
+		target=get_nearest_monster({min_xp:2500, max_att:500});
 		if(target) change_target(target); // Change target to newly found one
 	}
 	if(target && is_in_range(target)) {
