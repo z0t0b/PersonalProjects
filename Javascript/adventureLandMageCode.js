@@ -23,12 +23,16 @@ const LOWMP = character.max_mp / 1.75;
 
 // Checks if potions are empty and goes to purchase them automatically
 function getPotions() {
+	let fancypotsX = parent.G.maps.main[5].position[0];
+	let fancypotsY = parent.G.maps.main[5].position[1];
+	
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
-			if(!is_moving(character)) {
+			if(!smart_move) {
 				smart_move("fancypots");
 			}
-			if(quantity(ITEMARRAY[i]) != 100) {
+			if((character.x >= fancypotsX - 10 && character.x <= fancypotsX + 10)
+			&& (character.y >= fancypotsY - 10 && character.y <= fancypotsY + 10)) {
 				buy(ITEMARRAY[i], 100);
 			}
 			if(quantity(ITEMARRAY[i]) > 0) {
@@ -116,7 +120,7 @@ function farmMonster() {
 
 // Go to the desired monster farm
 function goToMonsterFarm() {
-	if(!is_moving(character)) {
+	if(!smart_move) {
 		smart_move(targetedMonster);
 	}
 	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
@@ -166,4 +170,4 @@ setInterval(() => {
 	else if(STATE == "FARMING") {
 		farmMonster(); // Attack specific monster in the area
 	}
-}, 1000); // Loops every second.
+}, 1000/2); // Loops every half of a second.
