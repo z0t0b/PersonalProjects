@@ -14,6 +14,7 @@
 // 2.) If the code is activated when standing near the targetedMonster...
 //   - The player will usually excessively spam smart_move
 // 3.) The player may also engage the wrong enemies
+//   - Slightly mitigated by specifying exp cutoffs
 
 var farm_mode=true;
 var targetedMonster="tortoise";
@@ -72,7 +73,7 @@ function statusChecks() {
 function farmMonster() {
 	var target=get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:300, max_att:420});
+		target=get_nearest_monster({min_xp:700, max_att:720});
 		if(target) change_target(target); // Change target to newly found one
 		else {
 			set_message("No Monsters");
@@ -110,7 +111,9 @@ function goToMonsterFarm() {
 		target=get_nearest_monster({min_xp:700, max_att:720});
 		if(target) change_target(target); // Change target to newly found one
 	}
-	if(is_in_range(target)) {
+	if(!is_in_range(target)) {
+		move(character.x-(target.x-character.x)/2, character.y-(target.y-character.y)/2); // Walk half the distance
+	} else {
 		STATE = "FARMING";
 	}
 }
@@ -151,5 +154,3 @@ setInterval(() => {
 		return;
 	}
 }, 1000); // Loops every second.
-// Learn Javascript: https://www.codecademy.com/learn/introduction-to-javascript
-// Write your own CODE: https://github.com/kaansoral/adventureland
