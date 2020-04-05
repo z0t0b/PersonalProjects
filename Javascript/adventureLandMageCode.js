@@ -7,14 +7,11 @@
 // 3.) Targeted monster is attacked after respawning or buying potions
 // 4.) Character accepts party requests from trusted players
 //   - They check every 10 minutes
-// 5.) This character will move slightly when attacking enemies to dodge
+// 5.) This character will move decent distances when attacking enemies to dodge
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
-// 2.) If the code is activated when standing near the targetedMonster...
-//   - The player will usually excessively spam smart_move
-// 3.) The player may also engage the wrong enemies
-// 4.) When going for potions, the character may spam the 'buy' command
+// 2.) When going for potions, the character may spam the 'buy' command
 
 var farm_mode=true;
 var targetedMonster="tortoise";
@@ -45,7 +42,6 @@ function getPotions() {
 // Checks if the character is dead and respawns them with a target in mind
 function resetCharacter() {
 	if(character.rip) {
-		STATE = "RESPAWNING";
 		setTimeout(() => {
 			respawn();
 			STATE = "MOVING";
@@ -69,35 +65,51 @@ function statusChecks() {
 	return true;
 }
 
+// Finds the desired monster
+function findTargetedMonster() {
+	var min_d=999999,target=null;
+	for(id in parent.entities) {
+		var current=parent.entities[id];
+		if(current.type != "monster" || !current.visible || current.dead) continue;
+		if(current.mtype && current.mtype != targetedMonster) continue;
+		var c_dist=parent.distance(character,current);
+		if(c_dist<min_d) min_d=c_dist,target=current;
+	}
+	return target;
+}
+
 // Farms target monsters after location has been reached
 function farmMonster() {
-	var target=get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:1500, max_att:500});
+		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
 		else {
 			set_message("No Monsters");
-			STATE="MOVING"
+			STATE = "MOVING";
 			return;
 		}
-	}
-	if(target && !is_in_range(target)) {
-		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}	
-	else if(can_attack(target)) {
+	else if(is_in_range(target) && can_attack(target)) {
 		set_message("Attacking");
 		attack(target);
 	}
+	else if(!is_in_range(target)) {
+		STATE = "MOVING";
+		return;
+	}
 	
 	// Move randomly in different directions (unique for different characters)
-	let randomDistance = Math.floor((Math.random() * 5) + 1);
+	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
-		if(randomDistance > 2) {
-		   move(character.x-50, character.y-50); // Move random distance away from target
-		} else if(randomDistance == 2) {
+		if(randomDistance == 4) {
+		   move(character.x-30, character.y-30); // Move random distance away from target
+		} else if(randomDistance == 3) {
 			move(character.x+30, character.y+30);
+		} else if(randomDistance == 2) {
+			move(character.x-30, character.y+30);
 		} else {
-			move(character.x+40, character.y-40);
+			move(character.x+30, character.y-30);
 		}
 	}	
 }
@@ -107,10 +119,13 @@ function goToMonsterFarm() {
 	if(!is_moving(character)) {
 		smart_move(targetedMonster);
 	}
-	var target=get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:1500, max_att:500});
+		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
+	}	
+	if(target && !is_in_range(target)) {
+		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
 	if(target && is_in_range(target)) {
 		STATE = "FARMING";
@@ -135,7 +150,7 @@ setInterval(() => {
 
 // 'main' method
 setInterval(() => {
-	if(STATE == "RESPAWNING") return;
+	if(character.rip) return;
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
@@ -150,6 +165,5 @@ setInterval(() => {
 	}
 	else if(STATE == "FARMING") {
 		farmMonster(); // Attack specific monster in the area
-		return;
 	}
 }, 1000); // Loops every second.

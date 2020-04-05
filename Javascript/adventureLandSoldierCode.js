@@ -11,10 +11,7 @@
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
-// 2.) If the code is activated when standing near the targetedMonster...
-//   - The player will usually excessively spam smart_move
-// 3.) The player may also engage the wrong enemies
-// 4.) When going for potions, the character may spam the 'buy' command
+// 2.) When going for potions, the character may spam the 'buy' command
 
 var farm_mode=true;
 var targetedMonster="tortoise";
@@ -45,7 +42,6 @@ function getPotions() {
 // Checks if the character is dead and respawns them with a target in mind
 function resetCharacter() {
 	if(character.rip) {
-		STATE = "RESPAWNING";
 		setTimeout(() => {
 			respawn();
 			STATE = "MOVING";
@@ -69,35 +65,50 @@ function statusChecks() {
 	return true;
 }
 
+// Finds the desired monster
+function findTargetedMonster() {
+	var min_d=999999,target=null;
+	for(id in parent.entities) {
+		var current=parent.entities[id];
+		if(current.type != "monster" || !current.visible || current.dead) continue;
+		if(current.mtype && current.mtype != targetedMonster) continue;
+		var c_dist=parent.distance(character,current);
+		if(c_dist<min_d) min_d=c_dist,target=current;
+	}
+	return target;
+}
+
 // Farms target monsters after location has been reached
 function farmMonster() {
-	var target=get_targeted_monster(); // Get currently targeted monster
+	var target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:1500, max_att:500});
+		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
 		else {
 			set_message("No Monsters");
-			STATE="MOVING"
+			STATE = "MOVING";
 			return;
 		}
 	}
-	if(target && !is_in_range(target)) {
-		move(character.x+(target.x-character.x)/1.5, character.y+(target.y-character.y)/1.5); // Walk 3/4 the distance
-	}	
-	else if(can_attack(target)) {
+	else if(is_in_range(target) && can_attack(target)) {
 		set_message("Attacking");
 		attack(target);
 	}
+	else if(!is_in_range(target)) {
+		move(target.x, target.y);
+	}
 	
 	// Move randomly in different directions (unique for different characters)
-	let randomDistance = Math.floor((Math.random() * 5) + 1);
+	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
-		if(randomDistance > 2) {
-		   move(character.x-randomDistance*2, character.y-randomDistance*2); // Move random distance away from target
+		if(randomDistance == 4) {
+		   move(character.x-15, character.y-15); // Move random distance away from target
+		} else if(randomDistance == 3) {
+			move(character.x+15, character.y+15);
 		} else if(randomDistance == 2) {
-			move(character.x-4, character.y+4);
+			move(character.x-15, character.y+15);
 		} else {
-			move(character.x+6, character.y-6);
+			move(character.x+15, character.y-15);
 		}
 	}	
 }
@@ -107,9 +118,9 @@ function goToMonsterFarm() {
 	if(!is_moving(character)) {
 		smart_move(targetedMonster);
 	}
-	var target=get_targeted_monster(); // Get currently targeted monster
+	var target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
-		target=get_nearest_monster({min_xp:1500, max_att:500});
+		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
 	}
 	if(target && !is_in_range(target)) {
@@ -138,7 +149,7 @@ setInterval(() => {
 
 // 'main' method
 setInterval(() => {
-	if(STATE == "RESPAWNING") return;
+	if(character.rip) return;
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
