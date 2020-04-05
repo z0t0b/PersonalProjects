@@ -94,7 +94,7 @@ function farmMonster() {
 		if(randomDistance > 2) {
 		   move(character.x-50, character.y-50); // Move random distance away from target
 		} else if(randomDistance == 2) {
-			move(character.x-30, character.y+30);
+			move(character.x+30, character.y+30);
 		} else {
 			move(character.x+40, character.y-40);
 		}
