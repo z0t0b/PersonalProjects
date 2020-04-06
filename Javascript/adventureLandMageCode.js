@@ -129,7 +129,7 @@ function goToMonsterFarm() {
 		if(target) change_target(target); // Change target to newly found one
 	}	
 	if(target && !is_in_range(target)) {
-		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
+		move(character.x+(target.x-character.x)/1.2, character.y+(target.y-character.y)/1.2); // Walk most of the distance
 	}
 	if(target && is_in_range(target)) {
 		STATE = "FARMING";
