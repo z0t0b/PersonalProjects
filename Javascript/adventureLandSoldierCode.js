@@ -31,8 +31,8 @@ function getPotions() {
 			if(!is_moving(character)) {
 				smart_move("fancypots");
 			}
-			if((character.x >= fancypotsX - 10 && character.x <= fancypotsX + 10)
-			&& (character.y >= fancypotsY - 10 && character.y <= fancypotsY + 10)) {
+			if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
+			&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
 				buy(ITEMARRAY[i], 100);
 			}
 			if(quantity(ITEMARRAY[i]) > 0) {
