@@ -17,7 +17,7 @@ var farm_mode=true;
 var targetedMonster="tortoise";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
-const PARTYARRAY = ["Magra", "Dexla", "Noirme"];
+const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const LOWHP = character.max_hp / 1.75;
 const LOWMP = character.max_mp / 1.75;
 
