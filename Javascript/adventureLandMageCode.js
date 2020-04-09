@@ -153,10 +153,10 @@ setInterval(() => {
 	}
 
 	// This next part moves the character to the craftsman and (hopefully) automatically crafts a basket of eggs
-	let hasEnoughEggs = True;
+	let hasEnoughEggs = true;
 	for(let i = 0; i < EGGARRAY.length; i++) {
 		if(quantity(EGGARRAY[i]) == 0) {
-			hasEnoughEggs = False;
+			hasEnoughEggs = false;
 		}
 	}
 	if(hasEnoughEggs) {
