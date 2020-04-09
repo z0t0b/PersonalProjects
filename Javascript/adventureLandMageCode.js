@@ -14,7 +14,7 @@
 // 2.) When going for potions, the character may spam the 'buy' command
 
 var farm_mode=true;
-var targetedMonster="tortoise";
+var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
@@ -171,14 +171,14 @@ setInterval(() => {
 
 // 'main' method
 setInterval(() => {
-	if(character.rip || STATE == "TIMEOUT") return;
+	if(STATE == "TIMEOUT") return;
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
 	
 	var results = statusChecks(); // Must return true to proceed
 	
-	if(!farm_mode || is_moving(character) || !results) return;
+	if(!farm_mode || is_moving(character) || !results || character.rip) return;
 	loot();
 	
 	if(STATE == "MOVING") {
