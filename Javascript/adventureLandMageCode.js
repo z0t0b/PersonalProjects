@@ -101,8 +101,7 @@ function farmMonster() {
 		attack(target);
 	}
 	else if(!is_in_range(target)) {
-		STATE = "MOVING";
-		return;
+		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
 	
 	// Move randomly in different directions (unique for different characters)
