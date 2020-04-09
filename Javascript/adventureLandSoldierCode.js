@@ -18,8 +18,9 @@ var targetedMonster="tortoise";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
-const LOWHP = character.max_hp / 1.75;
-const LOWMP = character.max_mp / 1.75;
+const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
+const LOWHP = character.max_hp / 1.2;
+const LOWMP = character.max_mp / 1.2;
 
 // Checks if potions are empty and goes to purchase them automatically
 function getPotions() {
@@ -46,6 +47,7 @@ function getPotions() {
 // Checks if the character is dead and respawns them with a target in mind
 function resetCharacter() {
 	if(character.rip) {
+		STATE = "TIMEOUT";
 		setTimeout(() => {
 			respawn();
 			STATE = "MOVING";
@@ -149,11 +151,27 @@ setInterval(() => {
 	for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}
-}, 60000 * 10); // Occurs every 10 minutes
+
+	// This next part moves the character to the craftsman and (hopefully) automatically crafts a basket of eggs
+	let hasEnoughEggs = True;
+	for(let i = 0; i < EGGARRAY.length; i++) {
+		if(quantity(EGGARRAY[i]) == 0) {
+			hasEnoughEggs = False;
+		}
+	}
+	if(hasEnoughEggs) {
+		STATE = "TIMEOUT";
+		smart_move("craftsman");
+		setTimeout(() => {
+			auto_craft("basketofeggs");
+			STATE = "MOVING";
+		}, 60000 * 2); // waits 2 minutes 
+	}
+}, 60000 * 45); // Occurs every 45 minutes
 
 // 'main' method
 setInterval(() => {
-	if(character.rip) return;
+	if(character.rip || STATE == "TIMEOUT") return;
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
@@ -168,6 +186,5 @@ setInterval(() => {
 	}
 	else if(STATE == "FARMING") {
 		farmMonster(); // Attack specific monster in the area
-		return;
 	}
 }, 1000/2); // Loops every half of a second.
