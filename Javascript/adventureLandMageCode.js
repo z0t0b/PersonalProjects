@@ -167,7 +167,7 @@ setInterval(() => {
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
 	}
-}, 60000 * 45); // Occurs every 45 minutes
+}, 60000 * 10); // Occurs every 10 minutes
 
 // 'main' method
 setInterval(() => {
