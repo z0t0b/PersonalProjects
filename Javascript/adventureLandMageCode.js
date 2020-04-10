@@ -11,7 +11,6 @@
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
-// 2.) When going for potions, the character may spam the 'buy' command
 
 var farm_mode=true;
 var targetedMonster="scorpion";
