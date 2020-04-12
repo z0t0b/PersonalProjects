@@ -16,10 +16,33 @@ var farm_mode=true;
 var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
+const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
+
+// Sells useless items specified in the SELLARRAY above
+function sellUselessItems() {
+	let basicsX = parent.G.maps.main.npcs[6].position[0];
+	let basicsY = parent.G.maps.main.npcs[6].position[1];
+	
+	for(let i = 0; i < SELLARRAY.length; i++) {
+		if(quantity(SELLARRAY[i]) > 0) {
+			if(!is_moving(character)) {
+				smart_move("basics");
+			}
+			if((character.x >= basicsX-30 && character.x <= basicsX+30)
+			&& (character.y >= basicsY-30 && character.y <= basicsY+30)) {
+				sell(locate_item(SELLARRAY[i]), quantity(SELLARRAY[i]));
+			}
+			if(quantity(ITEMARRAY[i]) == 0) {
+				STATE = "MOVING";
+				return "Useless items sold!";
+			} else return "Useless items not sold!";
+		}
+	}
+}
 
 // Checks if potions are empty and goes to purchase them automatically
 function getPotions() {
@@ -64,6 +87,13 @@ function statusChecks() {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			STATE = "MOVING";
 			if(getPotions() == "Potions found!") return true;
+			else return false;
+		}
+	}
+	for(let i = 0; i < SELLARRAY.length; i++) {
+		if(quantity(SELLARRAY[i]) > 0) {
+			STATE = "MOVING";
+			if(sellUselessItems() == "Useless items sold!") return true;
 			else return false;
 		}
 	}
