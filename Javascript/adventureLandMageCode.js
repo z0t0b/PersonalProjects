@@ -16,7 +16,7 @@ var farm_mode=true;
 var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
-const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes"];
+const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
@@ -56,7 +56,7 @@ function getPotions() {
 			}
 			if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
 			&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
-				buy(ITEMARRAY[i], 100);
+				buy(ITEMARRAY[i], 1000);
 			}
 			if(quantity(ITEMARRAY[i]) > 0) {
 				STATE = "MOVING";
