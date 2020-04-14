@@ -116,7 +116,7 @@ function findTargetedMonster() {
 
 // Farms target monsters after location has been reached
 function farmMonster() {
-	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
@@ -153,7 +153,7 @@ function farmMonster() {
         let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
         if(is_in_range(target)) {
             if(random == 1) { // 20% chance for skill to activate
-                parent.use_skill(skill, targetedMonster);
+                parent.use_skill(skill, target);
             }
         }
 	}

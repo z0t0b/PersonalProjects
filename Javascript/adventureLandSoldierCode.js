@@ -153,7 +153,7 @@ function farmMonster() {
         let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
         if(is_in_range(target)) {
             if(random == 1) { // 20% chance for skill to activate
-                parent.use_skill(skill, targetedMonster);
+                parent.use_skill(skill, target);
             }
         }
 	}

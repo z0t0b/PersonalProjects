@@ -17,7 +17,7 @@ var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
-const SKILLARRAY = ["alchemy", "magiport", "blink", "burst"];
+const SKILLARRAY = ["alchemy", "burst"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
@@ -116,7 +116,7 @@ function findTargetedMonster() {
 
 // Farms target monsters after location has been reached
 function farmMonster() {
-	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
@@ -150,10 +150,14 @@ function farmMonster() {
 	
     // Use skills
     for (skill of SKILLARRAY) {
-        let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
+        let random = Math.floor((Math.random() * 3) + 1); // Value between 1 and 3
         if(is_in_range(target)) {
-            if(random == 1) { // 20% chance for skill to activate
-                parent.use_skill(skill, targetedMonster);
+            if(random == 1) { // 33% chance for skill to activate
+				if(skill == "burst" && (character.mp > (character.max_mp / 2))) {
+					parent.use_skill(skill, target);
+				} if(skill != "burst") {
+					parent.use_skill(skill, target);
+				}
             }
         }
 	}
