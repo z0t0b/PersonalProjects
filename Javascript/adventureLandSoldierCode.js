@@ -11,9 +11,10 @@
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
+// 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
-var farm_mode=true;
-var targetedMonster="scorpion";
+var farm_mode = true;
+var targetedMonster = "spider";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
