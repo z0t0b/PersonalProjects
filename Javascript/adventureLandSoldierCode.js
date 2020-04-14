@@ -189,6 +189,8 @@ function on_party_invite(name) {
 
 // Methods that need to happen after larger time intervals
 setInterval(() => {
+	game_log("Current Level: " + character.level); // Log level
+	game_log("Current XP: " + character.xp); // Log XP
 	for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}

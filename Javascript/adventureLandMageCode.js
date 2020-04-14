@@ -14,7 +14,7 @@
 // 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
 var farm_mode = true;
-var targetedMonster = "scorpion";
+var targetedMonster = "spider";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
@@ -193,6 +193,8 @@ function on_party_invite(name) {
 
 // Methods that need to happen after larger time intervals
 setInterval(() => {
+	game_log("Current Level: " + character.level); // Log level
+	game_log("Current XP: " + character.xp); // Log XP
 	for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}
