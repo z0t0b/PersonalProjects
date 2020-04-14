@@ -7,7 +7,7 @@
 // 3.) Targeted monster is attacked after respawning or buying potions
 // 4.) Character accepts party requests from trusted players
 //   - They check every 10 minutes
-// 5.) This character will move slightly when attacking enemies to dodge
+// 5.) This character will move decent distances when attacking enemies to dodge
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
@@ -17,7 +17,7 @@ var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
-const SKILLARRAY = ["charge", "taunt"];
+const SKILLARRAY = ["curse", "partyheal"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
@@ -116,7 +116,7 @@ function findTargetedMonster() {
 
 // Farms target monsters after location has been reached
 function farmMonster() {
-	var target = get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
@@ -125,30 +125,30 @@ function farmMonster() {
 			STATE = "MOVING";
 			return;
 		}
-	}
+	}	
 	else if(is_in_range(target) && can_attack(target)) {
 		set_message("Attacking");
 		attack(target);
 	}
 	else if(!is_in_range(target)) {
-		move(target.x, target.y);
+		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
 	
 	// Move randomly in different directions (unique for different characters)
 	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
 		if(randomDistance == 4) {
-		   move(character.x-15, character.y-15); // Move random distance away from target
+		   move(character.x-30, character.y-30); // Move random distance away from target
 		} else if(randomDistance == 3) {
-			move(character.x+15, character.y+15);
+			move(character.x+30, character.y+30);
 		} else if(randomDistance == 2) {
-			move(character.x-15, character.y+15);
+			move(character.x-30, character.y+30);
 		} else {
-			move(character.x+15, character.y-15);
+			move(character.x+30, character.y-30);
 		}
-	}
-
-	// Use skills
+    }
+    
+    // Use skills
     for (skill of SKILLARRAY) {
         let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
         if(is_in_range(target)) {
@@ -164,15 +164,15 @@ function goToMonsterFarm() {
 	if(!is_moving(character)) {
 		smart_move(targetedMonster);
 	}
-	var target = get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
-	}
+	}	
 	if(target && !is_in_range(target)) {
-		move(target.x, target.y); // Walk to the enemy
-		STATE = "FARMING";
-	} else if(target && is_in_range(target)) {
+		move(character.x+(target.x-character.x)/1.2, character.y+(target.y-character.y)/1.2); // Walk most of the distance
+	}
+	if(target && is_in_range(target)) {
 		STATE = "FARMING";
 	}
 }

@@ -17,6 +17,7 @@ var targetedMonster="scorpion";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
+const SKILLARRAY = ["alchemy", "magiport", "blink", "burst"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
@@ -145,7 +146,17 @@ function farmMonster() {
 		} else {
 			move(character.x+30, character.y-30);
 		}
-	}	
+	}
+	
+    // Use skills
+    for (skill of SKILLARRAY) {
+        let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
+        if(is_in_range(target)) {
+            if(random == 1) { // 20% chance for skill to activate
+                parent.use_skill(skill, targetedMonster);
+            }
+        }
+	}
 }
 
 // Go to the desired monster farm
