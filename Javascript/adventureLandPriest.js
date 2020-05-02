@@ -69,6 +69,30 @@ function combineItems() {
 		if(item1 !== 42 && item2 !== 42 && item3 !== 42 && item4 !== 42) {
 			compound(item1, item2, item3, item4);
 		}
+		item1 = 42;
+		item2 = 42;
+		item3 = 42;
+		item4 = 42;
+		for(let i = 0; i < 42; i++) {
+			if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item1 == 42) {
+				item1 = i;
+				continue;
+			}
+			if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item2 == 42) {
+				item2 = i;
+				continue;
+			}
+			if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item3 == 42) {
+				item3 = i;
+				continue;
+			}
+			if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
+				item4 = i;
+			}
+		}
+		if(item1 !== 42 && item2 !== 42 && item3 !== 42 && item4 !== 42) {
+			compound(item1, item2, item3, item4);
+		}
 	}
 	return "Items combined!";
 }
@@ -160,6 +184,28 @@ function statusChecks() {
 					continue;
 				}
             }
+			if(item1 != 42 && item2 != 42 && item3 != 42) {
+				STATE = "MOVING";
+				if(combineItems() == "Items combined!") return true;
+				else return false;
+			}
+			item1 = 42;
+			item2 = 42;
+			item3 = 42;
+			for(let i = 0; i < 42; i++) {
+				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item1 == 42) {
+					item1 = i;
+					continue;
+				}
+				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item2 == 42) {
+					item2 = i;
+					continue;
+				}
+				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item3 == 42) {
+					item3 = i;
+					continue;
+				}
+			}
 			if(item1 != 42 && item2 != 42 && item3 != 42) {
 				STATE = "MOVING";
 				if(combineItems() == "Items combined!") return true;
