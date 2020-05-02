@@ -32,22 +32,20 @@ function combineItems(item1, item2, item3, item4) {
 	
 	if(!is_moving(character)) {
 		smart_move("newupgrade");
-		return;
 	}
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 		&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
 			buy("cscroll0", 50);
+			return;
 		}
 		if(quantity("cscroll0") == 0) {
 			STATE = "MOVING";
 			return;
 		}
 	}
-	if(!is_moving(character)) {
-		compound(item1, item2, item3, item4);
-		return "Items combined!";
-	}
+	compound(item1, item2, item3, item4);
+	return "Items combined!";
 }
 
 // Sells useless items specified in the SELLARRAY above
@@ -117,8 +115,10 @@ function statusChecks() {
 			if(getPotions() == "Potions found!") return true;
 			else return false;
 		}
-    }
-    for(items of COMBINEARRAY) {
+	}
+	
+    let itemsCombined = true;
+	for(items of COMBINEARRAY) {
 		if(quantity(items) >= 3) {
 			let item1 = 42;
 			let item2 = 42;
@@ -140,11 +140,11 @@ function statusChecks() {
 				if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
 					item4 = i;
 				}
-            }
+			}
 			if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
 				STATE = "MOVING";
-				if(combineItems(item1, item2, item3, item4) == "Items combined!") return true;
-				else return false;
+				if(combineItems(item1, item2, item3, item4) == "Items combined!") itemsCombined = true;
+				else itemsCombined = false;
 			}
 			item1 = 42;
 			item2 = 42;
@@ -169,9 +169,10 @@ function statusChecks() {
 			}
 			if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
 				STATE = "MOVING";
-				if(combineItems(item1, item2, item3, item4) == "Items combined!") return true;
-				else return false;
+				if(combineItems(item1, item2, item3, item4) == "Items combined!") itemsCombined = true;
+				else itemsCombined = false;
 			}
+			return itemsCombined;
 		}
 	}
 	for(let i = 0; i < SELLARRAY.length; i++) {
