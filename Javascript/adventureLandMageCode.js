@@ -20,31 +20,67 @@ const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
 const SKILLARRAY = ["alchemy", "burst"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
-const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring"];
+const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
 
 // Combines items that are otherwise useless; NOTE: INCREDIBLY JANKETY
-function combineItems(item1, item2, item3, item4) {
+function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
 	
-	if(!is_moving(character)) {
-		smart_move("newupgrade");
-	}
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 		&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
 			buy("cscroll0", 50);
-			return;
+			return "Items not combined!";
 		}
 		if(quantity("cscroll0") == 0) {
-			STATE = "MOVING";
-			return;
+			return "Items not combined!";
 		}
 	}
-	compound(item1, item2, item3, item4);
+
+	for(items of COMBINEARRAY) {
+		if(quantity(items) >= 3) {
+			for(let level = 0; level < 3; level++) {
+				let item1 = 42;
+				let item2 = 42;
+				let item3 = 42;
+				let item4 = 42;
+				for(let i = 0; i < 42; i++) {
+					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item1 == 42) {
+						item1 = i;
+						continue;
+					}
+					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item2 == 42) {
+						item2 = i;
+						continue;
+					}
+					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item3 == 42) {
+						item3 = i;
+						continue;
+					}
+					if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
+						item4 = i;
+					}
+				}
+				if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
+					STATE = "MOVING";
+					if(!is_moving(character)) {
+						smart_move("newupgrade");
+					}
+					if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
+						&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
+							compound(item1, item2, item3, item4);
+							return "Items combined!";
+					} else {
+						return "Items not combined!";
+					}
+				}
+			}
+		}
+	}
 	return "Items combined!";
 }
 
@@ -116,65 +152,6 @@ function statusChecks() {
 			else return false;
 		}
 	}
-
-	let itemsCombined = true;
-	for(items of COMBINEARRAY) {
-		if(quantity(items) >= 3) {
-			let item1 = 42;
-			let item2 = 42;
-			let item3 = 42;
-			let item4 = 42;
-			for(let i = 0; i < 42; i++) {
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 0 && item1 == 42) {
-					item1 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 0 && item2 == 42) {
-					item2 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 0 && item3 == 42) {
-					item3 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
-					item4 = i;
-				}
-			}
-			if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
-				STATE = "MOVING";
-				if(combineItems(item1, item2, item3, item4) == "Items combined!") itemsCombined = true;
-				else itemsCombined = false;
-			}
-			item1 = 42;
-			item2 = 42;
-			item3 = 42;
-			item4 = 42;
-			for(let i = 0; i < 42; i++) {
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item1 == 42) {
-					item1 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item2 == 42) {
-					item2 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == 1 && item3 == 42) {
-					item3 = i;
-					continue;
-				}
-				if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
-					item4 = i;
-				}
-			}
-			if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
-				STATE = "MOVING";
-				if(combineItems(item1, item2, item3, item4) == "Items combined!") itemsCombined = true;
-				else itemsCombined = false;
-			}
-			return itemsCombined;
-		}
-	}
 	for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			STATE = "MOVING";
@@ -182,7 +159,7 @@ function statusChecks() {
 			else return false;
 		}
 	}
-	return true;
+	if(combineItems() == "Items combined!") return true;
 }
 
 // Finds the desired monster
