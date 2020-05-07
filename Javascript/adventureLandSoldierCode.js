@@ -14,27 +14,27 @@
 // 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
 var farm_mode = true;
-var targetedMonster = "spider";
+var targetedMonster = "rat";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
-const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "quiver"];
+const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver"];
 const SKILLARRAY = ["charge", "taunt"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring"];
+const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
 
-// Combines items that are otherwise useless; NOTE: INCREDIBLY JANKETY
+// Combines items that are otherwise useless (combines items with level <= 2)
 function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
 	
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
-		&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
+			&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
 			buy("cscroll0", 50);
-			return "Items not combined!";
 		}
 		if(quantity("cscroll0") == 0) {
 			return "Items not combined!";
@@ -44,22 +44,19 @@ function combineItems() {
 	for(items of COMBINEARRAY) {
 		if(quantity(items) >= 3) {
 			for(let level = 0; level < 3; level++) {
-				let item1 = 42;
-				let item2 = 42;
-				let item3 = 42;
-				let item4 = 42;
+				let [item1, item2, item3, item4] = [42, 42, 42, 42];
 				for(let i = 0; i < 42; i++) {
-					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item1 == 42) {
-						item1 = i;
-						continue;
-					}
-					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item2 == 42) {
-						item2 = i;
-						continue;
-					}
-					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level && item3 == 42) {
-						item3 = i;
-						continue;
+					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level) {
+						if(item1 == 42) {
+							item1 = i;
+							continue;
+						} if(item2 == 42) {
+							item2 = i;
+							continue;
+						} if(item3 == 42) {
+							item3 = i;
+							continue;
+						}
 					}
 					if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
 						item4 = i;
@@ -93,15 +90,13 @@ function sellUselessItems() {
 		if(quantity(SELLARRAY[i]) > 0) {
 			if(!is_moving(character)) {
 				smart_move("basics");
-			}
-			if((character.x >= basicsX-30 && character.x <= basicsX+30)
-			&& (character.y >= basicsY-30 && character.y <= basicsY+30)) {
+			} if((character.x >= basicsX-30 && character.x <= basicsX+30)
+				&& (character.y >= basicsY-30 && character.y <= basicsY+30)) {
 				sell(locate_item(SELLARRAY[i]), quantity(SELLARRAY[i]));
-			}
-			if(quantity(ITEMARRAY[i]) == 0) {
+			} if(quantity(ITEMARRAY[i]) == 0) {
 				STATE = "MOVING";
 				return "Useless items sold!";
-			} else return "Useless items not sold!";
+			}
 		}
 	}
 }
@@ -115,15 +110,13 @@ function getPotions() {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			if(!is_moving(character)) {
 				smart_move("fancypots");
-			}
-			if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
-			&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
+			} if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
+				&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
 				buy(ITEMARRAY[i], 1000);
-			}
-			if(quantity(ITEMARRAY[i]) > 0) {
+			} if(quantity(ITEMARRAY[i]) > 0) {
 				STATE = "MOVING";
 				return "Potions found!";
-			} else return "Potions not found!";
+			}
 		}
 	}
 }
@@ -151,33 +144,44 @@ function statusChecks() {
 			if(getPotions() == "Potions found!") return true;
 			else return false;
 		}
-	}
-	for(let i = 0; i < SELLARRAY.length; i++) {
+	} for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			STATE = "MOVING";
 			if(sellUselessItems() == "Useless items sold!") return true;
 			else return false;
 		}
-	}
+	} /* for(let i = 0; i < STORAGEARRAY.length; i++) {
+		if(quantity(STORAGEARRAY[i]) > 0) {
+			STATE = "MOVING";
+			if(character.bank) {
+				bank_store(locate_item(STORAGEARRAY[i]));
+				return true;
+			} else if(!is_moving(character)) {
+				smart_move("bank");
+			}
+			return false;
+		}
+	} */
 	if(combineItems() == "Items combined!") return true;
+	else return false;
 }
 
 // Finds the desired monster
 function findTargetedMonster() {
-	var min_d=999999,target=null;
+	var min_d = 999999, target = null;
 	for(id in parent.entities) {
-		var current=parent.entities[id];
+		let current = parent.entities[id];
 		if(current.type != "monster" || !current.visible || current.dead) continue;
 		if(current.mtype && current.mtype != targetedMonster) continue;
-		var c_dist=parent.distance(character,current);
-		if(c_dist<min_d) min_d=c_dist,target=current;
+		let c_dist  =parent.distance(character, current);
+		if(c_dist<min_d) min_d = c_dist, target = current;
 	}
 	return target;
 }
 
 // Farms target monsters after location has been reached
 function farmMonster() {
-	var target = get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
@@ -186,12 +190,9 @@ function farmMonster() {
 			STATE = "MOVING";
 			return;
 		}
-	}
-	else if(is_in_range(target) && can_attack(target)) {
-		set_message("Attacking");
+	} else if(is_in_range(target) && can_attack(target)) {
 		attack(target);
-	}
-	else if(!is_in_range(target)) {
+	} else if(!is_in_range(target)) {
 		move(target.x, target.y);
 	}
 	
@@ -207,6 +208,7 @@ function farmMonster() {
 		} else {
 			move(character.x+15, character.y-15);
 		}
+		if(is_in_range(target)) attack(target);
 	}
 
 	// Use skills
@@ -225,12 +227,12 @@ function goToMonsterFarm() {
 	if(!is_moving(character)) {
 		smart_move(targetedMonster);
 	}
-	var target = get_targeted_monster(); // Get currently targeted monster
+	
+	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
-	}
-	if(target && !is_in_range(target)) {
+	} if(target && !is_in_range(target)) {
 		move(target.x, target.y); // Walk to the enemy
 		STATE = "FARMING";
 	} else if(target && is_in_range(target)) {
@@ -280,14 +282,13 @@ setInterval(() => {
 	}
 	
 	var results = statusChecks(); // Must return true to proceed
-	
 	if(!farm_mode || is_moving(character) || !results || character.rip) return;
-	loot();
 	
 	if(STATE == "MOVING") {
 		goToMonsterFarm(); // Go to farming location
 	}
 	else if(STATE == "FARMING") {
+		loot();
 		farmMonster(); // Attack specific monster in the area
 	}
 }, 1000/2); // Loops every half of a second.
