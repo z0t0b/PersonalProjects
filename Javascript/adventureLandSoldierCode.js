@@ -196,8 +196,10 @@ function farmMonster() {
 		move(target.x, target.y);
 	} else if(!is_in_range(target)) {
 		target = findTargetedMonster();
-		if(target) change_target(target); // Change target to newly found one
-		else {
+		if(target) {
+			change_target(target); // Change target to newly found one
+			move(target.x, target.y);
+		} else {
 			set_message("No Monsters");
 			STATE = "MOVING";
 			return;
