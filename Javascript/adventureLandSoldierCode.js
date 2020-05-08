@@ -192,8 +192,16 @@ function farmMonster() {
 		}
 	} else if(is_in_range(target) && can_attack(target)) {
 		attack(target);
-	} else if(!is_in_range(target)) {
+	} else if(is_in_range(target) && !can_attack(target)) {
 		move(target.x, target.y);
+	} else if(!is_in_range(target)) {
+		target = findTargetedMonster();
+		if(target) change_target(target); // Change target to newly found one
+		else {
+			set_message("No Monsters");
+			STATE = "MOVING";
+			return;
+		}
 	}
 	
 	// Move randomly in different directions (unique for different characters)
