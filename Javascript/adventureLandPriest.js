@@ -17,7 +17,7 @@ var farm_mode = true;
 var targetedMonster = "rat";
 var STATE;
 const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
-const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver"];
+const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
 const SKILLARRAY = ["curse", "partyheal"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring"];
