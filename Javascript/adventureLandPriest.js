@@ -16,12 +16,13 @@
 var farm_mode = true;
 var targetedMonster = "rat";
 var STATE;
-const ITEMARRAY = ["hpot0", "hpot1", "mpot0", "mpot1"];
+const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
 const SKILLARRAY = ["curse", "partyheal"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
-const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring"];
-const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll"];
+const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring", "vitearring"];
+const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
+						"essenceoffrost", "pants1", "gloves1", "helmet1", "boots1", "eslippers", "epyjamas", "ecape", "eears", "xmaspants"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
@@ -150,18 +151,7 @@ function statusChecks() {
 			if(sellUselessItems() == "Useless items sold!") return true;
 			else return false;
 		}
-	} /* for(let i = 0; i < STORAGEARRAY.length; i++) {
-		if(quantity(STORAGEARRAY[i]) > 0) {
-			STATE = "MOVING";
-			if(character.bank) {
-				bank_store(locate_item(STORAGEARRAY[i]));
-				return true;
-			} else if(!is_moving(character)) {
-				smart_move("bank");
-			}
-			return false;
-		}
-	} */
+	}
 	if(combineItems() == "Items combined!") return true;
 	else return false;
 }
@@ -270,6 +260,16 @@ setInterval(() => {
 			auto_craft("basketofeggs");
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
+	} for(let i = 0; i < STORAGEARRAY.length; i++) {
+		if(quantity(STORAGEARRAY[i]) > 0) {
+			STATE = "MOVING";
+			if(character.bank) {
+				bank_store(locate_item(STORAGEARRAY[i]));
+			} else if(!is_moving(character)) {
+				smart_move("bank");
+				transport("bank");
+			}
+		}
 	}
 }, 60000 * 10); // Occurs every 10 minutes
 
