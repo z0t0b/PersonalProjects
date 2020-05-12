@@ -33,11 +33,12 @@ function combineItems() {
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
 
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
-		if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
+		if(!is_moving(character)) {
+            smart_move("newupgrade");
+        } if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 			&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
 			buy("cscroll0", 50);
-		}
-		if(quantity("cscroll0") == 0) {
+		} if(quantity("cscroll0") == 0) {
 			return "Items not combined!";
 		}
 	}
