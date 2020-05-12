@@ -14,7 +14,7 @@
 // 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
 var farm_mode = true;
-var targetedMonster = "rat";
+var targetedMonster = "scorpion";
 var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
