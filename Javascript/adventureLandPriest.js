@@ -231,10 +231,8 @@ function goToMonsterFarm() {
 
 // Accept party invites from trusted players (specified in the array)
 function on_party_invite(name) {
-	for (name of PARTYARRAY){
-		if(PARTYARRAY.includes(name)) {
-			accept_party_invite(name);	
-		}
+	if(PARTYARRAY.includes(name)) {
+		accept_party_invite(name);	
 	}
 }
 

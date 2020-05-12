@@ -31,7 +31,7 @@ const LOWMP = character.max_mp / 1.2;
 function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
-	
+
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 			&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
@@ -86,7 +86,7 @@ function combineItems() {
 function sellUselessItems() {
 	let basicsX = parent.G.maps.main.npcs[6].position[0];
 	let basicsY = parent.G.maps.main.npcs[6].position[1];
-	
+
 	for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			if(!is_moving(character)) {
@@ -106,7 +106,7 @@ function sellUselessItems() {
 function getPotions() {
 	let fancypotsX = parent.G.maps.main.npcs[5].position[0];
 	let fancypotsY = parent.G.maps.main.npcs[5].position[1];
-	
+
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			if(!is_moving(character)) {
@@ -136,9 +136,9 @@ function resetCharacter() {
 // Checks the status of the character for auto-maintenance
 function statusChecks() {
 	if((character.hp < LOWHP) || (character.mp < LOWMP)) use_hp_or_mp();
-	
+
 	resetCharacter();
-	
+
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			STATE = "MOVING";
@@ -185,7 +185,7 @@ function farmMonster() {
 	} else if(!is_in_range(target)) {
 		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
-	
+
 	// Move randomly in different directions (unique for different characters)
 	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
@@ -200,7 +200,7 @@ function farmMonster() {
 		}
 		attack(target);
 	}
-	
+
     // Use skills
     for (skill of SKILLARRAY) {
         let random = Math.floor((Math.random() * 3) + 1); // Value between 1 and 3
@@ -235,10 +235,8 @@ function goToMonsterFarm() {
 
 // Accept party invites from trusted players (specified in the array)
 function on_party_invite(name) {
-	for (name of PARTYARRAY){
-		if(PARTYARRAY.includes(name)) {
-			accept_party_invite(name);	
-		}
+	if(PARTYARRAY.includes(name)) {
+		accept_party_invite(name);	
 	}
 }
 
@@ -283,10 +281,10 @@ setInterval(() => {
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
-	
+
 	var results = statusChecks(); // Must return true to proceed
 	if(!farm_mode || is_moving(character) || !results || character.rip) return;
-	
+
 	if(STATE == "MOVING") {
 		goToMonsterFarm(); // Go to farming location
 	}
