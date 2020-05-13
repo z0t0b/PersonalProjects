@@ -17,9 +17,7 @@ function getPotions() {
 	let fancypotsY = parent.G.maps.main.npcs[5].position[1];
 	
     if(quantity("mpot0") == 0) {
-        if(!is_moving(character)) {
-            smart_move("fancypots");
-        } if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
+        if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
             && (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
             buy("mpot0", 1000);
         } if(quantity("mpot0") > 0) {
