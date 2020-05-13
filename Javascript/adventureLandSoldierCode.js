@@ -22,7 +22,7 @@ const SKILLARRAY = ["charge", "taunt"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
-						"essenceoffrost", "pants1", "gloves1", "helmet1", "boots1", "eslippers", "epyjamas", "ecape", "eears", "xmaspants"];
+						"essenceoffrost", "pants1", "gloves1", "helmet1", "boots1", "eslippers", "epyjamas", "ecape", "eears", "xmaspants", "sshield", "sstinger", "hbow"];
 const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
@@ -283,7 +283,7 @@ setInterval(() => {
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
 	}
-}, 60000 * 10); // Occurs every 10 minutes
+}, 60000 * 15); // Occurs every 15 minutes
 
 // 'main' method
 setInterval(() => {
