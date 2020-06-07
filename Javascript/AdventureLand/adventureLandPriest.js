@@ -18,7 +18,7 @@ var targetedMonster = "scorpion";
 var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
-const SKILLARRAY = ["alchemy", "burst"];
+const SKILLARRAY = ["curse", "partyheal"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
@@ -31,7 +31,7 @@ const LOWMP = character.max_mp / 1.2;
 function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
-
+	
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if(!is_moving(character)) {
             smart_move("newupgrade");
@@ -87,7 +87,7 @@ function combineItems() {
 function sellUselessItems() {
 	let basicsX = parent.G.maps.main.npcs[6].position[0];
 	let basicsY = parent.G.maps.main.npcs[6].position[1];
-
+	
 	for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			if(!is_moving(character)) {
@@ -107,14 +107,14 @@ function sellUselessItems() {
 function getPotions() {
 	let fancypotsX = parent.G.maps.main.npcs[5].position[0];
 	let fancypotsY = parent.G.maps.main.npcs[5].position[1];
-
+	
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			if(!is_moving(character)) {
 				smart_move("fancypots");
 			} if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
 				&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
-				buy(ITEMARRAY[i], 1000);
+				buy(ITEMARRAY[i], 500);
 			} if(quantity(ITEMARRAY[i]) > 0) {
 				STATE = "MOVING";
 				return "Potions found!";
@@ -137,9 +137,9 @@ function resetCharacter() {
 // Checks the status of the character for auto-maintenance
 function statusChecks() {
 	if((character.hp < LOWHP) || (character.mp < LOWMP)) use_hp_or_mp();
-
+	
 	resetCharacter();
-
+	
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			STATE = "MOVING";
@@ -157,10 +157,12 @@ function statusChecks() {
 			STATE = "MOVING";
 			if(character.bank) {
 				bank_store(locate_item(STORAGEARRAY[i]));
+				return true;
 			} else if(!is_moving(character)) {
 				smart_move("bank");
 				transport("bank");
 			}
+			return false;
 		}
 	}
 	if(combineItems() == "Items combined!") return true;
@@ -196,7 +198,7 @@ function farmMonster() {
 	} else if(!is_in_range(target)) {
 		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
-
+	
 	// Move randomly in different directions (unique for different characters)
 	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
@@ -210,21 +212,17 @@ function farmMonster() {
 			move(character.x+30, character.y-30);
 		}
 		attack(target);
-	}
+    }
 
     // Use skills
     for (skill of SKILLARRAY) {
-        let random = Math.floor((Math.random() * 3) + 1); // Value between 1 and 3
+        let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
         if(is_in_range(target)) {
-            if(random == 1) { // 33% chance for skill to activate
-				if(skill == "burst" && (character.mp > (character.max_mp / 2))) {
-					parent.use_skill(skill, target);
-				} if(skill != "burst") {
-					parent.use_skill(skill, target);
-				}
+            if(random == 1) { // 20% chance for skill to activate
+                parent.use_skill(skill, target);
             }
         }
-	}
+    }
 }
 
 // Go to the desired monster farm
@@ -253,9 +251,9 @@ function on_party_invite(name) {
 
 // Methods that need to happen after larger time intervals
 setInterval(() => {
-	game_log("Current Level: " + character.level); // Log level
+    game_log("Current Level: " + character.level); // Log level
 	game_log("Current XP: " + character.xp); // Log XP
-	for(let i = 0; i < PARTYARRAY.length; i++) {
+    for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}
 
@@ -274,7 +272,7 @@ setInterval(() => {
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
 	}
-}, 60000 * 15); // Occurs every 10 minutes
+}, 60000 * 15); // Occurs every 15 minutes
 
 // 'main' method
 setInterval(() => {
@@ -282,10 +280,10 @@ setInterval(() => {
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
-
+	
 	var results = statusChecks(); // Must return true to proceed
 	if(!farm_mode || is_moving(character) || !results || character.rip) return;
-
+	
 	if(STATE == "MOVING") {
 		goToMonsterFarm(); // Go to farming location
 	}

@@ -7,7 +7,7 @@
 // 3.) Targeted monster is attacked after respawning or buying potions
 // 4.) Character accepts party requests from trusted players
 //   - They check every 10 minutes
-// 5.) This character will move slightly when attacking enemies to dodge
+// 5.) This character will move decent distances when attacking enemies to dodge
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
@@ -18,7 +18,7 @@ var targetedMonster = "scorpion";
 var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
-const SKILLARRAY = ["charge", "taunt"];
+const SKILLARRAY = ["alchemy", "burst"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
@@ -114,7 +114,7 @@ function getPotions() {
 				smart_move("fancypots");
 			} if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
 				&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
-				buy(ITEMARRAY[i], 1000);
+				buy(ITEMARRAY[i], 500);
 			} if(quantity(ITEMARRAY[i]) > 0) {
 				STATE = "MOVING";
 				return "Potions found!";
@@ -157,12 +157,10 @@ function statusChecks() {
 			STATE = "MOVING";
 			if(character.bank) {
 				bank_store(locate_item(STORAGEARRAY[i]));
-				return true;
 			} else if(!is_moving(character)) {
 				smart_move("bank");
 				transport("bank");
 			}
-			return false;
 		}
 	}
 	if(combineItems() == "Items combined!") return true;
@@ -195,41 +193,35 @@ function farmMonster() {
 		}
 	} else if(is_in_range(target) && can_attack(target)) {
 		attack(target);
-	} else if(is_in_range(target) && !can_attack(target)) {
-		move(target.x, target.y);
 	} else if(!is_in_range(target)) {
-		target = findTargetedMonster();
-		if(target) {
-			change_target(target); // Change target to newly found one
-			move(target.x, target.y);
-		} else {
-			set_message("No Monsters");
-			STATE = "MOVING";
-			return;
-		}
+		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
 	}
 
 	// Move randomly in different directions (unique for different characters)
 	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
 		if(randomDistance == 4) {
-		   move(character.x-15, character.y-15); // Move random distance away from target
+		   move(character.x-30, character.y-30); // Move random distance away from target
 		} else if(randomDistance == 3) {
-			move(character.x+15, character.y+15);
+			move(character.x+30, character.y+30);
 		} else if(randomDistance == 2) {
-			move(character.x-15, character.y+15);
+			move(character.x-30, character.y+30);
 		} else {
-			move(character.x+15, character.y-15);
+			move(character.x+30, character.y-30);
 		}
-		if(is_in_range(target)) attack(target);
+		attack(target);
 	}
 
-	// Use skills
+    // Use skills
     for (skill of SKILLARRAY) {
-        let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
+        let random = Math.floor((Math.random() * 3) + 1); // Value between 1 and 3
         if(is_in_range(target)) {
-            if(random == 1) { // 20% chance for skill to activate
-                parent.use_skill(skill, target);
+            if(random == 1) { // 33% chance for skill to activate
+				if(skill == "burst" && (character.mp > (character.max_mp / 2))) {
+					parent.use_skill(skill, target);
+				} if(skill != "burst") {
+					parent.use_skill(skill, target);
+				}
             }
         }
 	}
@@ -241,14 +233,13 @@ function goToMonsterFarm() {
 		smart_move(targetedMonster);
 	}
 
-	let target = get_targeted_monster(); // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
 	} if(target && !is_in_range(target)) {
-		move(target.x, target.y); // Walk to the enemy
-		STATE = "FARMING";
-	} else if(target && is_in_range(target)) {
+		move(character.x+(target.x-character.x)/1.2, character.y+(target.y-character.y)/1.2); // Walk most of the distance
+	} if(target && is_in_range(target)) {
 		STATE = "FARMING";
 	}
 }
@@ -283,7 +274,7 @@ setInterval(() => {
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
 	}
-}, 60000 * 15); // Occurs every 15 minutes
+}, 60000 * 15); // Occurs every 10 minutes
 
 // 'main' method
 setInterval(() => {

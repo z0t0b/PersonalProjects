@@ -7,7 +7,7 @@
 // 3.) Targeted monster is attacked after respawning or buying potions
 // 4.) Character accepts party requests from trusted players
 //   - They check every 10 minutes
-// 5.) This character will move decent distances when attacking enemies to dodge
+// 5.) This character will move slightly when attacking enemies to dodge
 //
 // -- KNOWN BUGS --
 // 1.) Characters sometimes use the smart_move command excessively
@@ -18,7 +18,7 @@ var targetedMonster = "scorpion";
 var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
-const SKILLARRAY = ["curse", "partyheal"];
+const SKILLARRAY = ["charge", "taunt"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
@@ -31,7 +31,7 @@ const LOWMP = character.max_mp / 1.2;
 function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
-	
+
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if(!is_moving(character)) {
             smart_move("newupgrade");
@@ -87,7 +87,7 @@ function combineItems() {
 function sellUselessItems() {
 	let basicsX = parent.G.maps.main.npcs[6].position[0];
 	let basicsY = parent.G.maps.main.npcs[6].position[1];
-	
+
 	for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			if(!is_moving(character)) {
@@ -107,14 +107,14 @@ function sellUselessItems() {
 function getPotions() {
 	let fancypotsX = parent.G.maps.main.npcs[5].position[0];
 	let fancypotsY = parent.G.maps.main.npcs[5].position[1];
-	
+
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			if(!is_moving(character)) {
 				smart_move("fancypots");
 			} if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
 				&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
-				buy(ITEMARRAY[i], 1000);
+				buy(ITEMARRAY[i], 500);
 			} if(quantity(ITEMARRAY[i]) > 0) {
 				STATE = "MOVING";
 				return "Potions found!";
@@ -137,9 +137,9 @@ function resetCharacter() {
 // Checks the status of the character for auto-maintenance
 function statusChecks() {
 	if((character.hp < LOWHP) || (character.mp < LOWMP)) use_hp_or_mp();
-	
+
 	resetCharacter();
-	
+
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			STATE = "MOVING";
@@ -195,26 +195,36 @@ function farmMonster() {
 		}
 	} else if(is_in_range(target) && can_attack(target)) {
 		attack(target);
+	} else if(is_in_range(target) && !can_attack(target)) {
+		move(target.x, target.y);
 	} else if(!is_in_range(target)) {
-		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
+		target = findTargetedMonster();
+		if(target) {
+			change_target(target); // Change target to newly found one
+			move(target.x, target.y);
+		} else {
+			set_message("No Monsters");
+			STATE = "MOVING";
+			return;
+		}
 	}
-	
+
 	// Move randomly in different directions (unique for different characters)
 	let randomDistance = Math.floor((Math.random() * 4) + 1);
 	if(is_in_range(target)) {
 		if(randomDistance == 4) {
-		   move(character.x-30, character.y-30); // Move random distance away from target
+		   move(character.x-15, character.y-15); // Move random distance away from target
 		} else if(randomDistance == 3) {
-			move(character.x+30, character.y+30);
+			move(character.x+15, character.y+15);
 		} else if(randomDistance == 2) {
-			move(character.x-30, character.y+30);
+			move(character.x-15, character.y+15);
 		} else {
-			move(character.x+30, character.y-30);
+			move(character.x+15, character.y-15);
 		}
-		attack(target);
-    }
+		if(is_in_range(target)) attack(target);
+	}
 
-    // Use skills
+	// Use skills
     for (skill of SKILLARRAY) {
         let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
         if(is_in_range(target)) {
@@ -222,7 +232,7 @@ function farmMonster() {
                 parent.use_skill(skill, target);
             }
         }
-    }
+	}
 }
 
 // Go to the desired monster farm
@@ -231,13 +241,14 @@ function goToMonsterFarm() {
 		smart_move(targetedMonster);
 	}
 
-	let target = get_targeted_monster(); // Get currently targeted monster // Get currently targeted monster
+	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
 		target = findTargetedMonster();
 		if(target) change_target(target); // Change target to newly found one
 	} if(target && !is_in_range(target)) {
-		move(character.x+(target.x-character.x)/1.2, character.y+(target.y-character.y)/1.2); // Walk most of the distance
-	} if(target && is_in_range(target)) {
+		move(target.x, target.y); // Walk to the enemy
+		STATE = "FARMING";
+	} else if(target && is_in_range(target)) {
 		STATE = "FARMING";
 	}
 }
@@ -251,9 +262,9 @@ function on_party_invite(name) {
 
 // Methods that need to happen after larger time intervals
 setInterval(() => {
-    game_log("Current Level: " + character.level); // Log level
+	game_log("Current Level: " + character.level); // Log level
 	game_log("Current XP: " + character.xp); // Log XP
-    for(let i = 0; i < PARTYARRAY.length; i++) {
+	for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}
 
@@ -280,10 +291,10 @@ setInterval(() => {
 	if(STATE != "FARMING") {
 		STATE = "MOVING"; // Default state for character
 	}
-	
+
 	var results = statusChecks(); // Must return true to proceed
 	if(!farm_mode || is_moving(character) || !results || character.rip) return;
-	
+
 	if(STATE == "MOVING") {
 		goToMonsterFarm(); // Go to farming location
 	}
