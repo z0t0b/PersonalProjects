@@ -13,9 +13,24 @@
 // 1.) Characters sometimes use the smart_move command excessively
 // 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
+/* GLOBAL VARIABLES
+ * All the global variables grouped for easy modifications. Variables without a value shouldn't be changed.
+ * - STATE: The state the character is in. Switches between TIMEOUT, MOVING and FARMING
+ * - farm_mode: Whether or not to farm monsters
+ * - targetedMonster: The key of the monster to farm
+ * - ITEMARRAY: Array of item keys that should be purchased upon depletion
+ * - SELLARRAY: Array of item keys that should be sold
+ * - SKILLARRAY: Array of skill keys that should be used
+ * - PARTYARRAY: Array of character names that should be sent party requests
+ * - COMBINEARRAY: Array of item keys that should be automatically combined (combines up to and including level 2 items)
+ * - STORAGEARRAY: Array of item keys that should be stored in the bank (stores when stack is >= 5)
+ * - EGGARRAY: Array of item keys (for eggs) that should be combined into a basket (for Easter special)
+ * - LOWHP: Value of HP when a potion will be used
+ * - LOWMP: Value of MP when a potion will be used
+ **/
+var STATE;
 var farm_mode = true;
 var targetedMonster = "arcticbee";
-var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
 const SKILLARRAY = ["curse", "partyheal"];
@@ -27,7 +42,9 @@ const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7"
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
 
-// Combines items that are otherwise useless (combines items with level <= 2)
+/* COMBINE ITEMS FUNCTION
+ * Automatically combines items with levels <= 2
+ **/
 function combineItems() {
 	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
 	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
@@ -83,7 +100,9 @@ function combineItems() {
 	return "Items combined!";
 }
 
-// Sells useless items specified in the SELLARRAY above
+/* SELL USELESS ITEMS FUNCTION
+ * Uses the item keys in the SELLARRAY variable for automatic selling
+ **/
 function sellUselessItems() {
 	let basicsX = parent.G.maps.main.npcs[6].position[0];
 	let basicsY = parent.G.maps.main.npcs[6].position[1];
@@ -103,7 +122,9 @@ function sellUselessItems() {
 	}
 }
 
-// Checks if potions are empty and goes to purchase them automatically
+/* GET POTIONS FUNCTION
+ * Uses the item keys in the ITEMARRAY to refill potions upon depletion (buys 500 potions)
+ **/
 function getPotions() {
 	let fancypotsX = parent.G.maps.main.npcs[5].position[0];
 	let fancypotsY = parent.G.maps.main.npcs[5].position[1];
@@ -123,7 +144,9 @@ function getPotions() {
 	}
 }
 
-// Checks if the character is dead and respawns them with a target in mind
+/* RESET CHARACTER FUNCTION
+ * Puts the character state into TIMEOUT and respawns the character
+ **/
 function resetCharacter() {
 	if(character.rip) {
 		STATE = "TIMEOUT";
@@ -134,7 +157,10 @@ function resetCharacter() {
 	}
 }
 
-// Checks the status of the character for auto-maintenance
+/* STATUS CHECKS FUNCTION
+ * Uses potions, respawns character, and purchases/sells/stores items when necessary
+ * Essentially an auto-maintenance function
+ **/
 function statusChecks() {
 	if((character.hp < LOWHP) || (character.mp < LOWMP)) use_hp_or_mp();
 	
@@ -169,7 +195,9 @@ function statusChecks() {
 	else return false;
 }
 
-// Finds the desired monster
+/* FIND TARGETED MONSTER FUNCTION
+ * Finds the targeted monster specified in the targetedMonster variable and targets it
+ **/
 function findTargetedMonster() {
 	var min_d = 999999, target = null;
 	for(id in parent.entities) {
@@ -182,7 +210,11 @@ function findTargetedMonster() {
 	return target;
 }
 
-// Farms target monsters after location has been reached
+/* FARM MONSTER FUNCTION
+ * Targets the monster for farming and does the following:
+ * - Handles moving/strafing during combat
+ * - Handles using skills
+ **/
 function farmMonster() {
 	let target = get_targeted_monster(); // Get currently targeted monster
 	if(!target) { // If no target was found
@@ -225,7 +257,10 @@ function farmMonster() {
     }
 }
 
-// Go to the desired monster farm
+/* GO TO MONSTER FARM FUNCTION
+ * Moves the character to the monster farm location and selects the closest monster as a target
+ * Sets the character to the FARMING state when a target is selected
+ **/
 function goToMonsterFarm() {
 	if(!is_moving(character)) {
 		smart_move(targetedMonster);
@@ -242,14 +277,21 @@ function goToMonsterFarm() {
 	}
 }
 
-// Accept party invites from trusted players (specified in the array)
+/* ON PARTY INVITE FUNCTION
+ * Accept a party invite from a character specified in the PARTYARRAY variable
+ **/
 function on_party_invite(name) {
 	if(PARTYARRAY.includes(name)) {
 		accept_party_invite(name);	
 	}
 }
 
-// Methods that need to happen after larger time intervals
+/* REGULAR INTERVAL CODE
+ * Does the following every 15 minutes:
+ * - Logs the characters current level and XP
+ * - Accepts party invites from listed players
+ * - Creates baskets of eggs from eggs (for easter event)
+ **/
 setInterval(() => {
     game_log("Current Level: " + character.level); // Log level
 	game_log("Current XP: " + character.xp); // Log XP
@@ -272,9 +314,16 @@ setInterval(() => {
 			STATE = "MOVING";
 		}, 60000 * 2); // waits 2 minutes 
 	}
-}, 60000 * 15); // Occurs every 15 minutes
+}, 60000 * 15);
 
-// 'main' method
+/* REGULAR INTERVAL CODE
+ * Does the following every half of a second:
+ * - Skips the rest if the current state is TIMEOUT
+ * - Sets the default state to MOVING if not in FARMING or TIMEOUT (catch-all)
+ * - Performs status checks
+ * - Prevents farming if the user isn't in farm mode, is currently moving, failed the status checks or is dead
+ * - Otherwise, moves to the monster farm and farms/loots monsters
+ **/
 setInterval(() => {
 	if(STATE == "TIMEOUT") return;
 	if(STATE != "FARMING") {
@@ -291,4 +340,4 @@ setInterval(() => {
 		loot();
 		farmMonster(); // Attack specific monster in the area
 	}
-}, 1000/2); // Loops every half of a second.
+}, 1000/2);
