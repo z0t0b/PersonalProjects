@@ -228,21 +228,20 @@ function farmMonster() {
 	} else if(is_in_range(target) && can_attack(target)) {
 		attack(target);
 	} else if(!is_in_range(target)) {
-		move(character.x+(target.x-character.x)/2, character.y+(target.y-character.y)/2); // Walk half the distance
+		move(character.x+(target.x-character.x)/1.5, character.y+(target.y-character.y)/1.5); // Walk a portion of the distance
 	}
 	
 	// Move randomly in different directions (unique for different characters)
-	let randomDistance = Math.floor((Math.random() * 4) + 1);
+	let randomDistance = Math.floor((Math.random() * 8) + 1);
 	if(is_in_range(target)) {
-		if(randomDistance == 4) {
-		   move(character.x-30, character.y-30); // Move random distance away from target
-		} else if(randomDistance == 3) {
-			move(character.x+30, character.y+30);
-		} else if(randomDistance == 2) {
-			move(character.x-30, character.y+30);
-		} else {
-			move(character.x+30, character.y-30);
-		}
+		if(randomDistance == 8) move(character.x-40, character.y);
+		if(randomDistance == 7) move(character.x+40, character.y);
+		if(randomDistance == 6) move(character.x, character.y-40);
+		if(randomDistance == 5) move(character.x, character.y+40);
+		if(randomDistance == 4) move(character.x-40, character.y-40);
+		if(randomDistance == 3) move(character.x+40, character.y+40);
+		if(randomDistance == 2) move(character.x-40, character.y+40);
+		if(randomDistance == 1) move(character.x+40, character.y-40);
 		attack(target);
     }
 
@@ -340,4 +339,4 @@ setInterval(() => {
 		loot();
 		farmMonster(); // Attack specific monster in the area
 	}
-}, 1000/2);
+}, 1000/4);

@@ -33,7 +33,7 @@ var farm_mode = true;
 var targetedMonster = "arcticbee";
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
-const SKILLARRAY = ["charge", "taunt"];
+const SKILLARRAY = ["charge", "taunt", "dash", "cleave", "hardshell"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
 const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
@@ -242,27 +242,30 @@ function farmMonster() {
 	}
 
 	// Move randomly in different directions (unique for different characters)
-	let randomDistance = Math.floor((Math.random() * 4) + 1);
+	let randomDistance = Math.floor((Math.random() * 8) + 1);
 	if(is_in_range(target)) {
-		if(randomDistance == 4) {
-		   move(character.x-15, character.y-15); // Move random distance away from target
-		} else if(randomDistance == 3) {
-			move(character.x+15, character.y+15);
-		} else if(randomDistance == 2) {
-			move(character.x-15, character.y+15);
-		} else {
-			move(character.x+15, character.y-15);
-		}
+		if(randomDistance == 8) move(character.x-15, character.y);
+		if(randomDistance == 7) move(character.x+15, character.y);
+		if(randomDistance == 6) move(character.x, character.y-15);
+		if(randomDistance == 5) move(character.x, character.y+15);
+		if(randomDistance == 4) move(character.x-15, character.y-15);
+		if(randomDistance == 3) move(character.x+15, character.y+15);
+		if(randomDistance == 2) move(character.x-15, character.y+15);
+		if(randomDistance == 1) move(character.x+15, character.y-15);
 		if(is_in_range(target)) attack(target);
 	}
 
 	// Use skills
     for (skill of SKILLARRAY) {
-        let random = Math.floor((Math.random() * 5) + 1); // Value between 1 and 5
+        let random = Math.floor((Math.random() * 20) + 1); // Value between 1 and 20
         if(is_in_range(target)) {
-            if(random == 1) { // 20% chance for skill to activate
-                parent.use_skill(skill, target);
-            }
+            if(random <= 10) { // 50% chance for skill to activate
+                if(skill == "charge" || skill == "taunt") parent.use_skill(skill, target);
+			} else if(random > 15) { // 25% chance for skill to activate
+				if(skill == "cleave" && character.mp > 720) parent.use_skill(skill, target);
+				if(skill == "dash") parent.use_skill(skill, target);
+				if(skill == "hardshell" && character.hp < 500) parent.use_skill(skill, target);
+			}
         }
 	}
 }
@@ -351,4 +354,4 @@ setInterval(() => {
 		loot();
 		farmMonster(); // Attack specific monster in the area
 	}
-}, 1000/2);
+}, 1000/4);
