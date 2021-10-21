@@ -14,7 +14,7 @@
 // 2.) Characters will freak out and spam smart_move and other commands if they are not in the mainland
 
 var farm_mode = true;
-var targetedMonster = "scorpion";
+var targetedMonster = "arcticbee";
 var STATE;
 const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
@@ -34,7 +34,7 @@ function combineItems() {
 	
 	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
 		if(!is_moving(character)) {
-            smart_move("newupgrade");
+            parent.current_map === "main" ? smart_move("newupgrade") : smart_move("main");
         } if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 			&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
 			buy("cscroll0", 50);
@@ -67,7 +67,7 @@ function combineItems() {
 				if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
 					STATE = "MOVING";
 					if(!is_moving(character)) {
-						smart_move("newupgrade");
+						parent.current_map === "main" ? smart_move("newupgrade") : smart_move("main");
 					}
 					if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
 						&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
@@ -91,7 +91,7 @@ function sellUselessItems() {
 	for(let i = 0; i < SELLARRAY.length; i++) {
 		if(quantity(SELLARRAY[i]) > 0) {
 			if(!is_moving(character)) {
-				smart_move("basics");
+				parent.current_map === "main" ? smart_move("basics") : smart_move("main");
 			} if((character.x >= basicsX-30 && character.x <= basicsX+30)
 				&& (character.y >= basicsY-30 && character.y <= basicsY+30)) {
 				sell(locate_item(SELLARRAY[i]), quantity(SELLARRAY[i]));
@@ -111,7 +111,7 @@ function getPotions() {
 	for(let i = 0; i < ITEMARRAY.length; i++) {
 		if(quantity(ITEMARRAY[i]) == 0) {
 			if(!is_moving(character)) {
-				smart_move("fancypots");
+				parent.current_map === "main" ? smart_move("fancypots") : smart_move("main");
 			} if((character.x >= fancypotsX-30 && character.x <= fancypotsX+30)
 				&& (character.y >= fancypotsY-30 && character.y <= fancypotsY+30)) {
 				buy(ITEMARRAY[i], 500);
@@ -153,13 +153,13 @@ function statusChecks() {
 			else return false;
 		}
 	} for(let i = 0; i < STORAGEARRAY.length; i++) {
-		if(quantity(STORAGEARRAY[i]) > 0) {
+		if(quantity(STORAGEARRAY[i]) >= 5) {
 			STATE = "MOVING";
 			if(character.bank) {
 				bank_store(locate_item(STORAGEARRAY[i]));
 				return true;
 			} else if(!is_moving(character)) {
-				smart_move("bank");
+				parent.current_map === "main" ? smart_move("bank") : smart_move("main");
 				transport("bank");
 			}
 			return false;
