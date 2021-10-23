@@ -22,9 +22,7 @@
  * - SELLARRAY: Array of item keys that should be sold
  * - SKILLARRAY: Array of skill keys that should be used
  * - PARTYARRAY: Array of character names that should be sent party requests
- * - COMBINEARRAY: Array of item keys that should be automatically combined (combines up to and including level 2 items)
  * - STORAGEARRAY: Array of item keys that should be stored in the bank (stores when stack is >= 5)
- * - EGGARRAY: Array of item keys (for eggs) that should be combined into a basket (for Easter special)
  * - LOWHP: Value of HP when a potion will be used
  * - LOWMP: Value of MP when a potion will be used
  **/
@@ -35,70 +33,10 @@ const ITEMARRAY = ["hpot1", "mpot1"];
 const SELLARRAY = ["wgloves", "wcap", "wbreeches", "wshoes", "wshield", "quiver", "wattire"];
 const SKILLARRAY = ["blink", "burst"];
 const PARTYARRAY = ["Magra", "Dexla", "Noirme", "Draxious", "Sacerdos"];
-const COMBINEARRAY = ["hpbelt", "ringsj", "hpamulet", "wbook0", "vitring", "intring", "dexring", "strring", "strearring", "intearring", "dexearring", "vitearring"];
 const STORAGEARRAY = ["smush", "beewings", "ascale", "poison", "seashell", "spidersilk", "bfur", "pleather", "rattail", "gem0", "gslime", "cscale", "crabclaw", "frogt", "vitscroll",
-						"essenceoffrost", "pants1", "gloves1", "helmet1", "boots1", "eslippers", "epyjamas", "ecape", "eears", "xmaspants", "sshield", "sstinger", "hbow"];
-const EGGARRAY = ["egg0", "egg1", "egg2", "egg3", "egg4", "egg5", "egg6", "egg7", "egg8"];
+						"essenceoffrost", "pants1", "gloves1", "helmet1", "boots1", "eslippers", "epyjamas", "ecape", "eears", "xmaspants", "sshield", "sstinger", "hbow", "candy0", "candy1"];
 const LOWHP = character.max_hp / 1.2;
 const LOWMP = character.max_mp / 1.2;
-
-/* COMBINE ITEMS FUNCTION
- * Automatically combines items with levels <= 2
- **/
-function combineItems() {
-	let newUpgradeX = parent.G.maps.main.npcs[0].position[0];
-	let newUpgradeY = parent.G.maps.main.npcs[0].position[1];
-
-	if(quantity("cscroll0") == 0) { // Ensure character has 50 scrolls
-		if(!is_moving(character)) {
-            parent.current_map === "main" ? smart_move("newupgrade") : smart_move("main");
-        } if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
-			&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
-			buy("cscroll0", 50);
-		} if(quantity("cscroll0") == 0) {
-			return "Items not combined!";
-		}
-	}
-
-	for(items of COMBINEARRAY) {
-		if(quantity(items) >= 3) {
-			for(let level = 0; level < 3; level++) {
-				let [item1, item2, item3, item4] = [42, 42, 42, 42];
-				for(let i = 0; i < 42; i++) {
-					if(parent.character.items[i] !== null && parent.character.items[i].name == items && parent.character.items[i].level == level) {
-						if(item1 == 42) {
-							item1 = i;
-							continue;
-						} if(item2 == 42) {
-							item2 = i;
-							continue;
-						} if(item3 == 42) {
-							item3 = i;
-							continue;
-						}
-					}
-					if(parent.character.items[i] !== null && parent.character.items[i].name == "cscroll0" && item4 == 42) {
-						item4 = i;
-					}
-				}
-				if(item1 != 42 && item2 != 42 && item3 != 42 && item4 != 42) {
-					STATE = "MOVING";
-					if(!is_moving(character)) {
-						parent.current_map === "main" ? smart_move("newupgrade") : smart_move("main");
-					}
-					if((character.x >= newUpgradeX-30 && character.x <= newUpgradeX+30)
-						&& (character.y >= newUpgradeY-30 && character.y <= newUpgradeY+30)) {
-							compound(item1, item2, item3, item4);
-							return "Items combined!";
-					} else {
-						return "Items not combined!";
-					}
-				}
-			}
-		}
-	}
-	return "Items combined!";
-}
 
 /* SELL USELESS ITEMS FUNCTION
  * Uses the item keys in the SELLARRAY variable for automatic selling
@@ -189,8 +127,7 @@ function statusChecks() {
 			}
 		}
 	}
-	if(combineItems() == "Items combined!") return true;
-	else return false;
+	return true;
 }
 
 /* FIND TARGETED MONSTER FUNCTION
@@ -289,7 +226,6 @@ function on_party_invite(name) {
  * Does the following every 15 minutes:
  * - Logs the characters current level and XP
  * - Accepts party invites from listed players
- * - Creates baskets of eggs from eggs (for easter event)
  **/
 setInterval(() => {
 	game_log("Current Level: " + character.level); // Log level
@@ -297,26 +233,10 @@ setInterval(() => {
 	for(let i = 0; i < PARTYARRAY.length; i++) {
 		on_party_invite(PARTYARRAY[i]); // Accept party invites from specified users
 	}
-
-	// This next part moves the character to the craftsman and (hopefully) automatically crafts a basket of eggs
-	let hasEnoughEggs = true;
-	for(let i = 0; i < EGGARRAY.length; i++) {
-		if(quantity(EGGARRAY[i]) == 0) {
-			hasEnoughEggs = false;
-		}
-	}
-	if(hasEnoughEggs) {
-		STATE = "TIMEOUT";
-		smart_move("craftsman");
-		setTimeout(() => {
-			auto_craft("basketofeggs");
-			STATE = "MOVING";
-		}, 60000 * 2); // waits 2 minutes 
-	}
 }, 60000 * 15);
 
 /* REGULAR INTERVAL CODE
- * Does the following every half of a second:
+ * Does the following every fourth of a second:
  * - Skips the rest if the current state is TIMEOUT
  * - Sets the default state to MOVING if not in FARMING or TIMEOUT (catch-all)
  * - Performs status checks
